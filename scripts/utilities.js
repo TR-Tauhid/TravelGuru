@@ -21,7 +21,7 @@ const footerBox = document.getElementById("footer-box");
 let selectSitArr = [];
 let discountPrice = 0;
 let discount = 0;
-let totalPrice = 0; // Initialize as a number for calculations
+let totalPrice = 0; 
 
 function removeBg(val) {
   document.getElementById(val).classList.remove("bg-[#1DD100]");
@@ -99,7 +99,6 @@ couponBtn.addEventListener("click", function applyCoupon() {
   couponBox.classList.add("hidden");
   discountValueBox.classList.remove("hidden");
   discountValueBox.classList.add("flex");
-  console.log(discountPrice);
 });
 
 function validateForm() {
@@ -115,7 +114,7 @@ numBox.addEventListener("keyup", validateForm);
 function nextClicked() {
   const form = document.querySelector("form");
 
-  if (!form) return; // Ensure form exists
+  if (!form) return; 
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -130,11 +129,12 @@ function nextClicked() {
       number,
       email,
       journey_date,
-      totalPrice: discountPrice || totalPrice, // Apply discount if available
+      totalPrice: discountPrice || totalPrice, 
       selectSitArr: selectSitArr.join(","),
     };
 
-    fetch("http://localhost/assignment_5/main.php", {
+    console.log(passengerData);
+    fetch("http://localhost:8080/main.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -143,26 +143,27 @@ function nextClicked() {
     })
       .then((res) => {
         if (!res.ok) {
+          console.log(res)
           throw new Error("Network response was not ok");
         }
         return res.json();
       })
       .then((data) => {
-        // Check if there's an error in the response
+        
         if (data.error) {
-          alert(data.error, "154"); // Show error message if present
+          alert(data.error, "154"); 
         } else {
-          alert(data.message); // Show success message
+          alert(data.message); 
           if (data.downloadLink) {
-            // If a download link is present
+            
             const link = document.createElement("a");
             link.href = data.downloadLink;
-            link.download = data.downloadLink; // Set the download attribute
-            document.body.appendChild(link); // Append the link to the body
-            link.click(); // Programmatically click the link to trigger the download
-            document.body.removeChild(link); // Remove the link after triggering
+            link.download = data.downloadLink; 
+            document.body.appendChild(link); 
+            link.click(); 
+            document.body.removeChild(link); 
           }
-          // Hide relevant sections after success
+          
           successBox.classList.remove("hidden");
           header.classList.add("hidden");
           main.classList.add("hidden");
@@ -177,3 +178,4 @@ function nextClicked() {
       });
   });
 }
+
