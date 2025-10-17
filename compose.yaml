@@ -1,35 +1,32 @@
 version: '3.8'
 
 services:
-  # Your Web/PHP/Apache service
+  # Web/PHP/Apache service
   web:
     build: .
     volumes:
       - .:/var/www/html
     ports:
       - "8080:80"
-    # Tells the web service to wait for the db service to be healthy/ready
     depends_on:
       - db
-    # IMPORTANT: Use environment variables for DB credentials (best practice)
+    env_file:
+      - ./.env
     environment:
-      # These can be used to pass credentials to the main.php script if needed
-      DB_HOST: db 
-      DB_NAME: bus_ticket
-      DB_USER: root
-      DB_PASS: dbPassword
+      DB_HOST: ${DB_HOST} 
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
 
-  # The new Database service (e.g., MySQL)
   db:
     image: mysql:8.0
-    # Set the root password and the database name your PHP expects
+    command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: abcd
-      MYSQL_DATABASE: bus_ticket
-    # Use a volume so your data persists even if the container is stopped or removed
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
-# Define a volume for persistent database storage
 volumes:
   db_data:

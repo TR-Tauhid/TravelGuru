@@ -133,7 +133,6 @@ function nextClicked() {
       selectSitArr: selectSitArr.join(","),
     };
 
-    console.log(passengerData);
     fetch("http://localhost:8080/main.php", {
       method: "POST",
       headers: {
@@ -141,13 +140,15 @@ function nextClicked() {
       },
       body: JSON.stringify(passengerData),
     })
-      .then((res) => {
-        if (!res.ok) {
-          console.log(res)
-          throw new Error("Network response was not ok");
+      .then(async (res) => {
+        const text = await res.text(); 
+        try {
+          return JSON.parse(text);
+        } catch {
+          throw new Error("Invalid JSON received: " + text);
         }
-        return res.json();
       })
+
       .then((data) => {
         
         if (data.error) {
