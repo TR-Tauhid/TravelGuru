@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
-            $mail->setFrom('tauhidt994@gmail.com', 'Bus Ticket Service');
+            $mail->setFrom(getenv('APP_EMAIL'), 'Bus Ticket Service');
             $mail->addAddress($email, $name);
 
             $mail->isHTML(true);

@@ -1,36 +1,37 @@
 FROM php:8.2-apache
 
-# Install dependencies for PHP extensions
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    zip \
+    default-mysql-client \
     unzip \
-    libssl-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
+    git \
+    curl \
     libzip-dev \
-    pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo_mysql mysqli zip gd
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Enable PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install mysqli pdo_mysql gd mbstring zip
-
-# Enable Apache rewrite module
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copy application files
 COPY . /var/www/html
 
-# Install PHP dependencies (including PHPMailer)
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose port 80
 EXPOSE 80
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]
